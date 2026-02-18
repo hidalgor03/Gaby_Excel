@@ -8,6 +8,7 @@ from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib.units import inch
 from io import BytesIO
 from datetime import datetime
+from zoneinfo import ZoneInfo  # ✅ NUEVO
 
 st.set_page_config(page_title="Generador de Acta Corporativa", layout="wide")
 
@@ -105,7 +106,7 @@ if uploaded_file:
                 elements = []
                 styles = getSampleStyleSheet()
 
-                # Logo ajustable
+                # Logo
                 if logo_file:
                     logo = Image(
                         logo_file,
@@ -121,7 +122,11 @@ if uploaded_file:
                 elements.append(Paragraph(f"Curso: {curso}", styles["Normal"]))
                 elements.append(Paragraph(f"Instructor: {instructor}", styles["Normal"]))
                 elements.append(Paragraph(f"Criterio aprobación: ≥ {puntaje_minimo}%", styles["Normal"]))
-                elements.append(Paragraph(f"Fecha generación: {datetime.now().strftime('%d-%m-%Y %H:%M')}", styles["Normal"]))
+
+                # ✅ FECHA CON ZONA HORARIA DE CHILE
+                fecha_chile = datetime.now(ZoneInfo("America/Santiago")).strftime("%d-%m-%Y %H:%M")
+                elements.append(Paragraph(f"Fecha generación: {fecha_chile}", styles["Normal"]))
+
                 elements.append(Spacer(1, 0.5 * inch))
 
                 data = [df_final.columns.tolist()] + df_final.values.tolist()
@@ -145,7 +150,7 @@ if uploaded_file:
 
                 elements.append(Spacer(1, 0.1 * inch))
 
-                # Firma ajustable
+                # Firma
                 if firma_file:
                     elements.append(Paragraph("Firma Instructor:", styles["Normal"]))
                     firma = Image(
